@@ -9,8 +9,8 @@
 using namespace std;
 
 /* JUEGOS POR TURNOS
-Los 3 héroes se van a enfrentar al mismo tiempo con los enemigos
-Hay que usar estrategias para ganar
+Los 3 héroes se van a enfrentar  de manera aleatoria al mismo tiempo con los enemigos.
+Hay que usar estrategias para ganar.
 */
 
 // Enum ---------------------------------------------------------------------------------------------
@@ -20,6 +20,7 @@ enum Estados{
 	DEBILITADO,
 	FUERZA,
 	FORTALEZA,
+	MUERTO,
 	CANTIDAD_ESTADOS
 };
 
@@ -28,13 +29,15 @@ class Personaje{
 		
 	public:
 		string nombre;
+		int id;
 		int vida;
 		int ataque;
 		int defensa;
-		bitset<5> estado {0b0000};
+		bitset<5> estado {0b0000}; // Extremo derecho (0 = Evenenado)
 		
 		// Constructor
-		Personaje(string n, int v, int a, int d){
+		Personaje(int i, string n, int v, int a, int d){
+			id = i;
 			nombre = n;
 			vida = v;
 			ataque = a;
@@ -75,6 +78,7 @@ bool vidaHeroes();
 
 void iniciarJuego();
 void reestablecerEstadisticas();
+void editarIndices();
 void infoGeneral(int);
 void combate();
 void atacar(Personaje&, int);
@@ -89,7 +93,7 @@ void detalleEnemigos();
 class Arquero : public Personaje{
 	
 	public:
-		Arquero(string n, int v, int a, int d) : Personaje(n,v,a,d){ }
+		Arquero(int i, string n, int v, int a, int d) : Personaje(i,n,v,a,d){ }
 		
 		void activarHabilidad(Personaje& p){
 			p.ataque += 3;
@@ -101,7 +105,7 @@ class Arquero : public Personaje{
 
 class Sacerdote : public Personaje{
 	public:
-		Sacerdote(string n, int v, int a, int d) : Personaje(n,v,a,d){ }
+		Sacerdote(int i, string n, int v, int a, int d) : Personaje(i,n,v,a,d){ }
 		
 		void activarHabilidad(Personaje& p){
 			quitarDebuff(p);
@@ -112,7 +116,7 @@ class Sacerdote : public Personaje{
 
 class Escudero : public Personaje{
 	public:
-		Escudero(string n, int v, int a, int d) : Personaje(n,v,a,d){ }
+		Escudero(int i, string n, int v, int a, int d) : Personaje(i,n,v,a,d){ }
 		
 		void activarHabilidad(Personaje& p){
 			p.defensa += 3;
@@ -124,7 +128,7 @@ class Escudero : public Personaje{
 
 class DemonKing : public Personaje{
 	public:
-		DemonKing(string n, int v, int a, int d) : Personaje(n,v,a,d){ }
+		DemonKing(int i, string n, int v, int a, int d) : Personaje(i,n,v,a,d){ }
 		
 		void activarHabilidad(Personaje& p){
 		}
@@ -133,11 +137,11 @@ class DemonKing : public Personaje{
 
 // Variables Globales---------------------------------------------------------------------------------------
 bool flag = true;
-Arquero arq("ARQUERO", 50, 25, 10);
-Sacerdote sac("SACERDOTE", 60, 20, 10);
-Escudero esc("ESCUDERO", 80, 15, 15);
+Arquero arq(1, "ARQUERO", 50, 25, 10);
+Sacerdote sac(2, "SACERDOTE", 60, 20, 10);
+Escudero esc(3, "ESCUDERO", 80, 15, 15);
 vector<Personaje*> heroes;
-DemonKing dem("DEMONG KING", 150, 25, 10);
+DemonKing dem(99, "DEMONG KING", 150, 20, 10);
 
 
 int main(){
@@ -160,10 +164,10 @@ int main(){
 }
 
 void reestablecerEstadisticas(){
-	arq.vida = 50; arq.ataque = 25; arq.defensa = 10;
-	sac.vida = 60; sac.ataque = 20; sac.defensa = 10;
-	esc.vida = 80; esc.ataque = 15; esc.defensa = 15;
-	dem.vida = 150; dem.ataque = 25; dem.defensa = 10;
+	arq.id = 1; arq.vida = 50; arq.ataque = 25; arq.defensa = 10;
+	sac.id = 2; sac.vida = 60; sac.ataque = 20; sac.defensa = 10;
+	esc.id = 3; esc.vida = 80; esc.ataque = 15; esc.defensa = 15;
+	dem.vida = 150; dem.ataque = 20; dem.defensa = 10;
 }
 
 int menu(){
@@ -231,7 +235,7 @@ void combate(){
 	
 	// El enemigo tendrá todos los turnos pares
 	int turno = 1;
-	int turnos_R = 50;
+	int turnos_R = 60;
 	int acc;
 	int aux = 0;
 	bool inner_flag = true;
@@ -241,7 +245,6 @@ void combate(){
 	do{
 		
 		infoGeneral(turnos_R);
-		
 		
 		
 		if((turno%2) == 0){
@@ -273,7 +276,7 @@ void combate(){
 				case 1: atacar(*heroes[index], turno); break;
 				case 2: 
 					int x;
-					cout<<"\nSeleccione un heroe [1-3]: "; cin>>x;
+					cout<<"\nSeleccione un heroe: "; cin>>x;
 					(heroes[index])->activarHabilidad(*heroes[x-1]); 
 					break;
 				case 3: 
@@ -283,7 +286,7 @@ void combate(){
 					turnos_R++;
 					aux++;
 					break;
-				default: cout<<"Valor fuera de rango"<<endl; turno--; break;
+				default: cout<<"\nValor fuera de rango"<<endl; turno--; break;
 			}
 			
 			
@@ -326,9 +329,9 @@ void infoGeneral(int turnos_R){
 	cout<<"==================================================="<<endl;	
 	cout<<"Turnos Restantes: "<<turnos_R<<endl;
 	cout<<"====================="<<endl;
-	cout<<"\n[1] Arquero:   | Vida: "<<arq.vida<<" | Ataque: "<<arq.ataque<<" | Defensa: "<<arq.defensa<<" |"<<endl;
-	cout<<"[2] Sacerdote: | Vida: "<<sac.vida<<" | Ataque: "<<sac.ataque<<" | Defensa: "<<sac.defensa<<" |"<<endl;
-	cout<<"[3] Escudero:  | Vida: "<<esc.vida<<" | Ataque: "<<esc.ataque<<" | Defensa: "<<esc.defensa<<" |"<<endl;
+	cout<<"\n["<<arq.id<<"] Arquero:   | Vida: "<<arq.vida<<" | Ataque: "<<arq.ataque<<" | Defensa: "<<arq.defensa<<" |"<<endl;
+	cout<<"["<<sac.id<<"] Sacerdote: | Vida: "<<sac.vida<<" | Ataque: "<<sac.ataque<<" | Defensa: "<<sac.defensa<<" |"<<endl;
+	cout<<"["<<esc.id<<"] Escudero:  | Vida: "<<esc.vida<<" | Ataque: "<<esc.ataque<<" | Defensa: "<<esc.defensa<<" |"<<endl;
 }
 
 void atacar(Personaje& he, int turno){
@@ -368,15 +371,15 @@ void debuff(Personaje& he, int al3){
 
 void verificarVeneno(Personaje& arq, Personaje& sac, Personaje& esc){
 	
-	if(arq.estado[0]){
+	if(arq.estado[0] && arq.vida > 0){
 		arq.vida -= 5;
 		cout<<"- Arquero recibio 5 de dolor por veneno"<<endl;
 	} 
-	if(sac.estado[0]){
+	if(sac.estado[0] && sac.vida > 0){
 		sac.vida -= 5;	
 		cout<<"- Sacerdote recibio 5 de dolor por veneno"<<endl;
 	} 
-	if(esc.estado[0]){
+	if(esc.estado[0] && esc.vida > 0){
 		esc.vida -= 5;
 		cout<<"- Escudero recibio 5 de dolor por veneno"<<endl;
 	}
@@ -386,19 +389,26 @@ bool vidaHeroes(){
 	
 	if(arq.vida<0){
 		arq.vida = 0;
+		arq.id = 0;
 		heroes.erase(find(heroes.begin(), heroes.end(), &arq));
+		editarIndices();
 		cout<<"\nArquero ha perdido la vida en combate"<<endl;
+		
 	}
 	
 	if(sac.vida < 0){
 		sac.vida = 0;
+		sac.id = 0;
 		heroes.erase(find(heroes.begin(), heroes.end(), &sac));
+		editarIndices();
 		cout<<"\nSacerdote ha perdido la vida en combate"<<endl;
 	}
 	
 	if(esc.vida < 0){
 		esc.vida = 0;
+		esc.id = 0;
 		heroes.erase(find(heroes.begin(), heroes.end(), &esc));
+		editarIndices();
 		cout<<"\nEscudero ha perdido la vida en combate"<<endl;
 	}
 	
@@ -406,7 +416,7 @@ bool vidaHeroes(){
 }
 
 void quitarDebuff(Personaje& p){
-	constexpr bitset<5> mask0 {0b1'1000 };
+	constexpr bitset<5> mask0 {0b1'1000};
 	p.estado &= mask0;
 	
 	if(typeid(p) == typeid(Arquero)){
@@ -422,3 +432,12 @@ void quitarDebuff(Personaje& p){
 		if(p.defensa < 15) p.defensa = 15;
 	}
 }
+
+void editarIndices(){	
+	// GRACIAS GEMINI, me salvaste de hacer 40 lineas de código en esta función
+    for (int i = 0; i < heroes.size(); i++) {
+        heroes[i]->id = i + 1; 
+    }
+}
+
+    
