@@ -10,8 +10,6 @@
 
 <div align="center">
   <img src="./screenshot1.png" width="45%" alt="Battle Menu Screenshot">
-  <img width="5%" /> <img src="./screenshot2.png" width="45%" alt="Victory Screen Screenshot">
-  <br>
   <br>
   <em>Gameplay captures showing the turn-based combat, terminal interface, and state management.</em>
 </div>
