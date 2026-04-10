@@ -33,11 +33,3 @@ Take control of a party of three heroes (Archer, Priest, and Squire) as they fac
 
 <br>
 
-## 🚀 How to Run (Windows)
-
-Since this project uses Windows-specific commands (<code>system("cls")</code>), it is recommended to compile and run it on a Windows environment.
-
-1. Clone the repository:
-```bash
-# Replace YOUR_USERNAME with your actual GitHub username
-git clone [https://github.com/YOUR_USERNAME/console-combat-sim.git](https://github.com/YOUR_USERNAME/console-combat-sim.git)
